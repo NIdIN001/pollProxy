@@ -25,7 +25,7 @@ CacheReader::~CacheReader()
 {
 }
 
-void CacheReader::read(char * url) {
+void CacheReader::read(char* url) {
     this->url = url;
     messageQueue = cache->getChunks(url);
 

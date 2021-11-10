@@ -1,6 +1,6 @@
 #include "ClientSocketHandler.h"
 
-ClientSocketHandler::ClientSocketHandler(TcpSocket * clientSocket, HttpProxy *proxy):
+ClientSocketHandler::ClientSocketHandler(TcpSocket* clientSocket, HttpProxy* proxy):
 	clientSocket(clientSocket), proxy(proxy) {
 
 }
@@ -85,7 +85,7 @@ bool ClientSocketHandler::handle(PollResult pollResult) {
     return true;
 }
 
-void ClientSocketHandler::setHostSocket(TcpSocket * hostSocket) {
+void ClientSocketHandler::setHostSocket(TcpSocket* hostSocket) {
     this->hostSocket = hostSocket;
 }
 

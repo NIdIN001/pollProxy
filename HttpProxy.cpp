@@ -43,11 +43,11 @@ void HttpProxy::acceptClient() {
             } else {
                 for (int i = 0; i < proxyEntries.size(); i++) {
                     ProxyEntry proxyEnrty = proxyEntries[i];
+
                     if (proxyEnrty.clinetSocket->fd == pollresult.fd ||
                         (proxyEnrty.hostSocket != nullptr && proxyEnrty.hostSocket->fd == pollresult.fd)) {
-                        int keepConnection;
 
-                        keepConnection = proxyEnrty.clientSocketHandler->handle(pollresult);
+                        int keepConnection = proxyEnrty.clientSocketHandler->handle(pollresult);
                         if (!keepConnection) {
                             closeSession(i);
                             break;

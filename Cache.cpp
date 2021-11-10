@@ -1,6 +1,6 @@
 #include "Cache.h"
 
-void Cache::addEntry(char * url) {
+void Cache::addEntry(char* url) {
     cacheEntry cacheEntry;
     cacheEntry.url = url;
     cacheEntry.isFull = false;
@@ -8,7 +8,7 @@ void Cache::addEntry(char * url) {
     entries.push_front(cacheEntry);
 }
 
-void Cache::addChunk(char * url, messageChunk chunk) {
+void Cache::addChunk(char* url, messageChunk chunk) {
     //push chunk
     for (cacheEntry &it: entries) {
         if (strcmp(it.url, url) == 0) {
@@ -25,7 +25,7 @@ void Cache::addChunk(char * url, messageChunk chunk) {
     }
 }
 
-bool Cache::contains(char * url) {
+bool Cache::contains(char* url) {
     for (cacheEntry &it: entries) {
         if (strcmp(it.url, url) == 0) {
             return true;
@@ -35,7 +35,7 @@ bool Cache::contains(char * url) {
     return false;
 }
 
-std::list<messageChunk> Cache::getChunks(char * url) {
+std::list<messageChunk> Cache::getChunks(char* url) {
     for (cacheEntry &it: entries) {
         if (strcmp(it.url, url) == 0)
             return it.chunks;
@@ -44,7 +44,7 @@ std::list<messageChunk> Cache::getChunks(char * url) {
     return std::list<messageChunk>();
 }
 
-bool Cache::entryIsFull(char * url) {
+bool Cache::entryIsFull(char* url) {
     for (cacheEntry &it: entries) {
         if (strcmp(it.url, url) == 0)
             return it.isFull;
@@ -53,7 +53,7 @@ bool Cache::entryIsFull(char * url) {
     return false;
 }
 
-void Cache::makeEntryFull(char * url) {
+void Cache::makeEntryFull(char* url) {
     for (cacheEntry &ref: entries) {
         if (strcmp(ref.url, url) == 0) {
             ref.isFull = true;
@@ -62,7 +62,7 @@ void Cache::makeEntryFull(char * url) {
     }
 }
 
-void Cache::listenToUrl(char * url, CacheReader * listener) {
+void Cache::listenToUrl(char* url, CacheReader* listener) {
     listenerEntry listenerEntry;
     listenerEntry.url = url;
     listenerEntry.listener = listener;
@@ -70,7 +70,7 @@ void Cache::listenToUrl(char * url, CacheReader * listener) {
     listeners.push_back(listenerEntry);
 }
 
-void Cache::stopListening(CacheReader * listener) {
+void Cache::stopListening(CacheReader* listener) {
     for (int i = 0; i < listeners.size(); i++) {
         if (listeners[i].listener == listener)
             listeners.erase(listeners.begin() + i);

@@ -1,5 +1,4 @@
 #include "HostSocketHandler.h"
-#include "HostSocketHandler.h"
 
 HostSocketHandler::HostSocketHandler(TcpSocket * clientSocket, TcpSocket * hostSocket, Cache *cache, HttpProxy * proxy) {
     this->clientSocket = clientSocket;
