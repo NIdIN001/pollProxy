@@ -32,14 +32,16 @@ bool HostSocketHandler::recvChunk() {
 
 bool HostSocketHandler::sendChunk() {
     if (!messageQueue.empty()) {
+        std::cout << "HostSocketHandler messageQueue is not empty" << std::endl;
         messageChunk chunk = messageQueue.front();
-        //messageQueue.pop();
         messageQueue.pop_front();
 
         int length = clientSocket->_write(chunk.buf, chunk.length);
+        std::cout << "send " << length << " bytes" << std::endl;
         if (length == 0)
             return false;
     }
+
     return true;
 }
 

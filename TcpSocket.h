@@ -12,9 +12,10 @@
 #include <string>
 #include <arpa/inet.h>
 #include <netdb.h>
+
 class TcpSocket {
 private:
-    void resolveHostName(char *hostName, addrinfo **res);
+    static void resolveHostName(char *hostName,int port , addrinfo **res);
 
 public:
     int fd;

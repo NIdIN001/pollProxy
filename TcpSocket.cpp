@@ -18,14 +18,14 @@ char* TcpSocket::getHostName() {
     return hostName;
 }
 
-void TcpSocket::resolveHostName(char * hostName, addrinfo **res) {
+void TcpSocket::resolveHostName(char * hostName, int port,  addrinfo **res) {
     addrinfo hints;
     memset(&hints, 0, sizeof(hints));
     hints.ai_flags = AI_CANONNAME;
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
 
-    if (getaddrinfo(hostName, "80", &hints, res) != 0) {
+    if (getaddrinfo(hostName, std::to_string(port).c_str(), &hints, res) != 0) {
         std::cout << "Resolve for " << hostName << " failed" << std::endl;
     }
 }
@@ -33,7 +33,7 @@ void TcpSocket::resolveHostName(char * hostName, addrinfo **res) {
 void TcpSocket::_connect(char *hostName, int port) {
     this->hostName = hostName;
     struct addrinfo *hostAddrinfo;
-    resolveHostName(hostName, &hostAddrinfo);
+    resolveHostName(hostName,port, &hostAddrinfo);
     if (connect(fd, hostAddrinfo->ai_addr, hostAddrinfo->ai_addrlen) != 0) {
         std::cout << "Failed to connect to " << hostName << ":" << port << std::endl;
     }

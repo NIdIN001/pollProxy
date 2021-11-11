@@ -101,7 +101,6 @@ void HttpProxy::closeSession(int proxyEntryIndex) {
     proxyEntries.erase(proxyEntries.begin() + proxyEntryIndex);
 }
 
-
 void HttpProxy::gotNewRequest(ClientSocketHandler *clientSocketHandler, char *url) {
     std::cout << "Got request for " << url << " from client socket with fd = " << clientSocketHandler->getClientFd()
               << std::endl;
