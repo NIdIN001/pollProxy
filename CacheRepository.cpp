@@ -2,12 +2,12 @@
 
 CacheRepository::~CacheRepository() = default;
 
-bool CacheRepository::sendChunk() {
+bool CacheRepository::sendPath() {
     if (!messageQueue.empty()) {
         messageQueue.pop_front();
 
-        MessagePath chunk = messageQueue.front();
-        int length = writeSocket->socketWrite(chunk.data, chunk.length);
+        MessagePath msgPath = messageQueue.front();
+        int length = writeSocket->socketWrite(msgPath.data, msgPath.length);
         if (length == 0)
             return false;
     }
@@ -45,8 +45,8 @@ bool CacheRepository::isReading() {
     return url != nullptr;
 }
 
-void CacheRepository::putToQueue(MessagePath chunk) {
-    messageQueue.push_back(chunk);
+void CacheRepository::putToQueue(MessagePath msgPath) {
+    messageQueue.push_back(msgPath);
 }
 
 bool CacheRepository::handlePollRevents(PollResult pollResult) {
@@ -56,7 +56,7 @@ bool CacheRepository::handlePollRevents(PollResult pollResult) {
     if (pollResult.revents & POLLHUP) {
         return false;
     } else if (pollResult.revents & POLLOUT) {
-        return sendChunk();
+        return sendPath();
     }
 
     return true;

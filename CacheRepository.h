@@ -30,10 +30,10 @@ public:
 
     bool isReading();
 
-    void putToQueue(MessagePath chunk);
+    void putToQueue(MessagePath msgPath);
 
     bool handlePollRevents(PollResult pollResult);
 
 private:
-    bool sendChunk();
+    bool sendPath();
 };
