@@ -26,13 +26,13 @@ public:
 
     void read(char *_url);
 
-    void stopRead();
+    void finishRead();
 
     bool isReading();
 
-    void notify(MessagePath chunk);
+    void putToQueue(MessagePath chunk);
 
-    bool handle(PollResult pollresult);
+    bool handlePollRevents(PollResult pollResult);
 
 private:
     bool sendChunk();

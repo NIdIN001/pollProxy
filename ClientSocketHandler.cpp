@@ -27,7 +27,7 @@ bool ClientSocketHandler::parseRequest(char *req) {
 }
 
 
-bool ClientSocketHandler::recvChunk() {
+bool ClientSocketHandler::recvPath() {
     char *buf = new char[BUFFER_SIZE];
     int len = clientSocket->socketRead(buf, BUFFER_SIZE);
 
@@ -42,13 +42,13 @@ bool ClientSocketHandler::recvChunk() {
     return parseRequest(buf);
 }
 
-bool ClientSocketHandler::sendChunk() {
+bool ClientSocketHandler::sendPath() {
     if (!messageQueue.empty()) {
         std::cout << "ClientSocketHandler messageQueue is not empty" << std::endl;
-        MessagePath chunk = messageQueue.front();
+        MessagePath msgPath = messageQueue.front();
         messageQueue.pop_front();
 
-        int len = destServerSocket->socketWrite(chunk.data, chunk.length);
+        int len = destServerSocket->socketWrite(msgPath.data, msgPath.length);
         std::cout << "send " << len << " bytes" << std::endl;
         if (len == 0)
             return false;
@@ -63,10 +63,10 @@ bool ClientSocketHandler::handlePollResult(PollResult pollResult) {
 
     if (pollResult.fd == clientSocket->getFd()) {
         if (pollResult.revents & POLLIN)
-            return recvChunk();
+            return recvPath();
     } else if (destServerSocket != nullptr && pollResult.fd == destServerSocket->getFd()) {
         if (pollResult.revents & POLLOUT)
-            return sendChunk();
+            return sendPath();
     }
 
     return true;
@@ -74,8 +74,4 @@ bool ClientSocketHandler::handlePollResult(PollResult pollResult) {
 
 void ClientSocketHandler::setDestServerSocket(TcpSocket *destServer) {
     this->destServerSocket = destServer;
-}
-
-int ClientSocketHandler::getClientFd() {
-    return clientSocket->getFd();
 }

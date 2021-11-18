@@ -12,17 +12,17 @@ void Cache::addEmptyRecord(char *url) {
     records.push_front(cacheRecord);
 }
 
-void Cache::addPath(char *url, MessagePath chunk) {
+void Cache::addPath(char *url, MessagePath msgPath) {
     for (CacheRecord &record: records) {
         if (strcmp(record.url, url) == 0) {
-            record.paths.push_back(chunk);
+            record.paths.push_back(msgPath);
             break;
         }
     }
 
     for (Listener listener : listeners) {
         if (strcmp(listener.url, url) == 0) {
-            listener.listener->notify(chunk);
+            listener.listener->putToQueue(msgPath);
         }
     }
 }

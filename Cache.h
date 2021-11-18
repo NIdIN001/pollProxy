@@ -12,7 +12,7 @@ class Cache {
 public:
     void addEmptyRecord(char *url);
 
-    void addPath(char *url, MessagePath chunk);
+    void addPath(char *url, MessagePath msgPath);
 
     bool containsRecord(char *url);
 

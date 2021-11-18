@@ -40,7 +40,7 @@ bool DestServerSocketHandler::sendPath() {
     return true;
 }
 
-bool DestServerSocketHandler::handle(PollResult pollResult) {
+bool DestServerSocketHandler::handlePollRevents(PollResult pollResult) {
     if (pollResult.revents & POLLHUP)
         return false;
 

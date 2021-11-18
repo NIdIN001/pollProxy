@@ -14,9 +14,9 @@ class ClientSocketHandler {
 
     std::list<MessagePath> messageQueue;
 
-    bool recvChunk();
+    bool recvPath();
 
-    bool sendChunk();
+    bool sendPath();
 
     bool parseRequest(char *req);
 
@@ -28,7 +28,5 @@ public:
     bool handlePollResult(PollResult pollResult);
 
     void setDestServerSocket(TcpSocket *destServer);
-
-    int getClientFd();
 };
 

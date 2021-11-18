@@ -48,7 +48,7 @@ void ProxyServer::acceptClient() {
                         }
 
                         if (proxyTunnel.remoteServerSocket != nullptr) {
-                            isKeepConnection = proxyTunnel.remoteServerSocketHandler->handle(pollResult);
+                            isKeepConnection = proxyTunnel.remoteServerSocketHandler->handlePollRevents(pollResult);
 
                             if (!isKeepConnection) {
                                 closeConnection(i);
@@ -57,7 +57,7 @@ void ProxyServer::acceptClient() {
                         }
 
                         if (proxyTunnel.cacheReader->isReading()) {
-                            isKeepConnection = proxyTunnel.cacheReader->handle(pollResult);
+                            isKeepConnection = proxyTunnel.cacheReader->handlePollRevents(pollResult);
 
                             if (!isKeepConnection) {
                                 closeConnection(i);
@@ -90,7 +90,7 @@ void ProxyServer::closeConnection(int proxyEntryIndex) {
     }
 
     if (proxyEntry.cacheReader->isReading()) {
-        proxyEntry.cacheReader->stopRead();
+        proxyEntry.cacheReader->finishRead();
     }
 
     delete proxyEntry.cacheReader;
@@ -132,7 +132,7 @@ void ProxyServer::newRequest(ClientSocketHandler *clientSocketHandler, char *url
                 }
 
                 if (proxyTunnel.cacheReader->isReading())
-                    proxyTunnel.cacheReader->stopRead();
+                    proxyTunnel.cacheReader->finishRead();
                 else {
                     proxyTunnel.remoteServerSocketHandler->endReadingResponce();
                     proxyTunnel.remoteServerSocketHandler->waitForNextResponce(url);

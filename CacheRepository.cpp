@@ -33,7 +33,7 @@ void CacheRepository::read(char *_url) {
     }
 }
 
-void CacheRepository::stopRead() {
+void CacheRepository::finishRead() {
     if (url != nullptr) {
         cache->stopListening(this);
         std::cout << "Cache of " << url << " is ready" << std::endl;
@@ -45,11 +45,11 @@ bool CacheRepository::isReading() {
     return url != nullptr;
 }
 
-void CacheRepository::notify(MessagePath chunk) {
+void CacheRepository::putToQueue(MessagePath chunk) {
     messageQueue.push_back(chunk);
 }
 
-bool CacheRepository::handle(PollResult pollResult) {
+bool CacheRepository::handlePollRevents(PollResult pollResult) {
     if (pollResult.fd != writeSocket->getFd())
         return true;
 

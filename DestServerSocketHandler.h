@@ -23,7 +23,7 @@ public:
 
     ~DestServerSocketHandler();
 
-    bool handle(PollResult pollResult);
+    bool handlePollRevents(PollResult pollResult);
 
     void endReadingResponce();
 
