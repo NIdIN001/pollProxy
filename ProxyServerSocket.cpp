@@ -7,15 +7,14 @@ ProxyServerSocket::ProxyServerSocket(int port) {
     fd = socket(AF_INET, SOCK_STREAM, 0);
     setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &tmp, sizeof(int));
 
-    sockaddr_in serv_addr;
-    memset(&serv_addr, 0, sizeof(serv_addr));
+    sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
 
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    serv_addr.sin_port = htons(port);
-    serv_addr.sin_family = AF_INET;
-
-
-    if (bind(fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) != 0)
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr.sin_port = htons(port);
+    addr.sin_family = AF_INET;
+    
+    if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) != 0)
         std::cout << "Can't bind" << std::endl;
 
     listen(fd, BacklogSize);

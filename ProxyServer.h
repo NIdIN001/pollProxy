@@ -22,7 +22,7 @@ class ProxyServer {
     std::vector<ProxyTunnel> proxyTunnels;
 
 public:
-    explicit ProxyServer(int listenPort);
+    explicit ProxyServer(int port);
 
     ~ProxyServer();
 
@@ -33,7 +33,7 @@ public:
     void makeHttpsTunnel(ClientSocketHandler *clientSocketHandler, char *url);
 
 private:
-    void closeConnection(int proxyEntryIndex);
+    void closeConnection(int numberOfConnection);
 
     void acceptClient();
 };

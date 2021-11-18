@@ -1,6 +1,6 @@
 #include "ProxyServer.h"
 
-ProxyServer::ProxyServer(int listenPort) : serverSocket(listenPort) {
+ProxyServer::ProxyServer(int port) : serverSocket(port) {
     cache = new Cache();
 
     poller.addToPoll(serverSocket.getFd(), POLLIN | POLLPRI);
@@ -72,8 +72,8 @@ void ProxyServer::acceptClient() {
     }
 }
 
-void ProxyServer::closeConnection(int proxyEntryIndex) {
-    ProxyTunnel proxyEntry = proxyTunnels[proxyEntryIndex];
+void ProxyServer::closeConnection(int numberOfConnection) {
+    ProxyTunnel proxyEntry = proxyTunnels[numberOfConnection];
 
     poller.removeFromPoll(proxyEntry.clientSocket->getFd());
     proxyEntry.clientSocket->closeSocket();
@@ -95,7 +95,7 @@ void ProxyServer::closeConnection(int proxyEntryIndex) {
 
     delete proxyEntry.cacheReader;
 
-    proxyTunnels.erase(proxyTunnels.begin() + proxyEntryIndex);
+    proxyTunnels.erase(proxyTunnels.begin() + numberOfConnection);
 }
 
 void ProxyServer::newRequest(ClientSocketHandler *clientSocketHandler, char *url) {

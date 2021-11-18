@@ -1,9 +1,9 @@
 #include "DestServerSocketHandler.h"
 
-DestServerSocketHandler::DestServerSocketHandler(TcpSocket *clientSocket, TcpSocket *hostSocket, Cache *cache) {
+DestServerSocketHandler::DestServerSocketHandler(TcpSocket *clientSocket, TcpSocket *destServer, Cache *cache) {
     this->url = nullptr;
     this->clientSocket = clientSocket;
-    this->destServerSocket = hostSocket;
+    this->destServerSocket = destServer;
     this->cache = cache;
 }
 

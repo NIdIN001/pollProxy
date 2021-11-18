@@ -14,11 +14,11 @@ public:
 
     int getFd() const;
 
-    void socketConnect(char *_hostName, int port);
+    void socketConnect(char *_hostUrl, int port);
 
-    int socketRead(char *buf, int length) const;
+    int socketRead(char *buffer, int len) const;
 
-    int socketWrite(char *buf, int length) const;
+    int socketWrite(char *buffer, int len) const;
 
     void closeSocket() const;
 
@@ -27,6 +27,6 @@ public:
     char *getHostName();
 
 private:
-    void resolveHostName(char *hostName, int port, addrinfo **res);
+    void resolveHostName(char *hostUrl, int port, addrinfo **result);
 };
 

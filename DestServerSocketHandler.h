@@ -19,7 +19,7 @@ class DestServerSocketHandler {
     bool sendPath();
 
 public:
-    DestServerSocketHandler(TcpSocket *clientSocket, TcpSocket *hostSocket, Cache *cache);
+    DestServerSocketHandler(TcpSocket *clientSocket, TcpSocket *destServer, Cache *cache);
 
     ~DestServerSocketHandler();
 
