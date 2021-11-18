@@ -102,10 +102,10 @@ void ProxyServer::newRequest(ClientSocketHandler *clientSocketHandler, char *url
     if (!cache->containsRecord(url)) {
         for (ProxyTunnel &proxyTunnel : proxyTunnels) {
             if (proxyTunnel.clientSocketHandler == clientSocketHandler) {
-                long hostUrlLength = strstr(url, "/") - url;
-                char *hostUrl = new char[hostUrlLength + 1];
-                memccpy(hostUrl, url, 0, hostUrlLength);
-                hostUrl[hostUrlLength] = '\0';
+                long hostUrlLen = strstr(url, "/") - url;
+                char hostUrl[hostUrlLen + 1];
+                memccpy(hostUrl, url, 0, hostUrlLen);
+                hostUrl[hostUrlLen] = '\0';
 
                 if (proxyTunnel.remoteServerSocket == nullptr) {
                     proxyTunnel.remoteServerSocket = new TcpSocket();
@@ -119,9 +119,9 @@ void ProxyServer::newRequest(ClientSocketHandler *clientSocketHandler, char *url
                                                                                         proxyTunnel.remoteServerSocket,
                                                                                         cache);
                 } else if (strcmp(hostUrl, proxyTunnel.remoteServerSocket->getHostName()) != 0) {
-                    int oldDescriptor = proxyTunnel.remoteServerSocket->getFd();
+                    int invalidDescriptor = proxyTunnel.remoteServerSocket->getFd();
                     proxyTunnel.remoteServerSocket->closeSocket();
-                    poller.removeFromPoll(oldDescriptor);
+                    poller.removeFromPoll(invalidDescriptor);
                     delete proxyTunnel.remoteServerSocket;
 
                     proxyTunnel.remoteServerSocket = new TcpSocket();
