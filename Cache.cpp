@@ -1,33 +1,35 @@
 #include "Cache.h"
 
-void Cache::addEntry(char* url) {
-    cacheEntry cacheEntry;
-    cacheEntry.url = url;
-    cacheEntry.isFull = false;
+Cache::Cache() = default;
 
-    entries.push_front(cacheEntry);
+Cache::~Cache() = default;
+
+void Cache::addEmptyRecord(char *url) {
+    CacheRecord cacheRecord;
+    cacheRecord.isFull = false;
+    cacheRecord.url = url;
+
+    records.push_front(cacheRecord);
 }
 
-void Cache::addChunk(char* url, messageChunk chunk) {
-    //push chunk
-    for (cacheEntry &it: entries) {
-        if (strcmp(it.url, url) == 0) {
-            it.chunks.push_back(chunk);
+void Cache::addPath(char *url, MessagePath chunk) {
+    for (CacheRecord &record: records) {
+        if (strcmp(record.url, url) == 0) {
+            record.paths.push_back(chunk);
             break;
         }
     }
 
-    //notify listeners
-    for (listenerEntry listenerEntry : listeners) {
-        if (strcmp(listenerEntry.url, url) == 0) {
-            listenerEntry.listener->notify(chunk);
+    for (Listener listener : listeners) {
+        if (strcmp(listener.url, url) == 0) {
+            listener.listener->notify(chunk);
         }
     }
 }
 
-bool Cache::contains(char* url) {
-    for (cacheEntry &it: entries) {
-        if (strcmp(it.url, url) == 0) {
+bool Cache::containsRecord(char *url) {
+    for (CacheRecord &record: records) {
+        if (strcmp(record.url, url) == 0) {
             return true;
         }
     }
@@ -35,65 +37,42 @@ bool Cache::contains(char* url) {
     return false;
 }
 
-std::list<messageChunk> Cache::getChunks(char* url) {
-    for (cacheEntry &it: entries) {
-        if (strcmp(it.url, url) == 0)
-            return it.chunks;
+std::list<MessagePath> Cache::getRecordByUrl(char *url) {
+    for (CacheRecord &record: records) {
+        if (strcmp(record.url, url) == 0)
+            return record.paths;
     }
 
-    return std::list<messageChunk>();
+    return std::list<MessagePath>();
 }
 
-bool Cache::entryIsFull(char* url) {
-    for (cacheEntry &it: entries) {
-        if (strcmp(it.url, url) == 0)
-            return it.isFull;
+bool Cache::isRecordFull(char *url) {
+    for (CacheRecord &record: records) {
+        if (strcmp(record.url, url) == 0)
+            return record.isFull;
     }
 
     return false;
 }
 
-void Cache::makeEntryFull(char* url) {
-    for (cacheEntry &ref: entries) {
-        if (strcmp(ref.url, url) == 0) {
-            ref.isFull = true;
+void Cache::makeRecordFull(char *url) {
+    for (CacheRecord &record: records) {
+        if (strcmp(record.url, url) == 0) {
+            record.isFull = true;
             return;
         }
     }
 }
 
-void Cache::listenToUrl(char* url, CacheReader* listener) {
-    listenerEntry listenerEntry;
-    listenerEntry.url = url;
-    listenerEntry.listener = listener;
+void Cache::listenToUrl(char *url, CacheRepository *_listener) {
+    Listener listener{_listener, url};
 
-    listeners.push_back(listenerEntry);
+    listeners.push_back(listener);
 }
 
-void Cache::stopListening(CacheReader* listener) {
+void Cache::stopListening(CacheRepository *listener) {
     for (int i = 0; i < listeners.size(); i++) {
         if (listeners[i].listener == listener)
             listeners.erase(listeners.begin() + i);
     }
-}
-
-void Cache::clear() {
-    for (cacheEntry cacheEntry : entries) {
-        delete[] cacheEntry.url;
-
-        while (!cacheEntry.chunks.empty()) {
-            delete[] cacheEntry.chunks.front().buf;
-            delete[] cacheEntry.url;
-            cacheEntry.chunks.erase(cacheEntry.chunks.begin());
-        }
-    }
-}
-
-Cache::Cache()
-{
-}
-
-
-Cache::~Cache()
-{
 }

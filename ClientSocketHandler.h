@@ -1,38 +1,33 @@
 #pragma once
-#include "Cache.h"
-#include "TcpSocket.h"
-#include "HttpProxy.h"
+#include "ProxyServer.h"
 
-#include <iostream>
-#include <fstream>
-//#include <queue>
-#include <string> 
-
-class HttpProxy;
-struct messageChunk;
+class ProxyServer;
+struct MessagePath;
 
 class ClientSocketHandler {
-private:
-    TcpSocket *clientSocket;
-    TcpSocket *hostSocket = nullptr;
-    HttpProxy *proxy;
+    static const int BUFFER_SIZE = 65536;
+    static const int URL_MAX_LEN = 4096;
 
-    std::list<messageChunk> messageQueue;
+    TcpSocket *clientSocket = nullptr;
+    TcpSocket *destServerSocket = nullptr;
+    ProxyServer *proxyServer;
+
+    std::list<MessagePath> messageQueue;
 
     bool recvChunk();
 
     bool sendChunk();
 
-    bool parseRequest(char *request);
+    bool parseRequest(char *req);
 
 public:
-    ClientSocketHandler(TcpSocket *clientSocket, HttpProxy *proxy);
+    ClientSocketHandler(TcpSocket *clientSocket, ProxyServer *proxy);
 
     ~ClientSocketHandler();
 
-    bool handle(PollResult pollResult);
+    bool handlePollResult(PollResult pollResult);
 
-    void setHostSocket(TcpSocket *hostSocket);
+    void setDestServerSocket(TcpSocket *destServer);
 
     int getClientFd();
 };

@@ -5,11 +5,11 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(ppr
         Cache.cpp
-        CacheReader.cpp
+        CacheRepository.cpp
         ClientSocketHandler.cpp
-        HostSocketHandler.cpp
-        HttpProxy.cpp
+        DestServerSocketHandler.cpp
+        ProxyServer.cpp
         main.cpp
-        Poller.cpp
-        ServerSocket.cpp
+        Poll_Impl.cpp
+        ProxyServerSocket.cpp
         TcpSocket.cpp)

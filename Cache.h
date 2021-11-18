@@ -1,54 +1,30 @@
 #pragma once
-#include "CacheReader.h"
 
-#include <map>
-#include <list>
-#include <vector>
-#include <queue>
+#include "CacheRepository.h"
+#include "entities/entities.h"
 
-#define MAX_CHUNK_SIZE 1 << 16
-
-class CacheReader;
-
-struct messageChunk {
-	char *buf;
-	int length;
-};
-
-struct cacheEntry {
-    char *url;
-    std::list<messageChunk> chunks;
-    bool isFull;
-};
-
-struct listenerEntry {
-    char *url;
-    CacheReader *listener;
-};
+class CacheRepository;
 
 class Cache {
-    std::list<cacheEntry> entries;
-    std::vector<listenerEntry> listeners;
+    std::list<CacheRecord> records;
+    std::vector<Listener> listeners;
 
 public:
+    void addEmptyRecord(char *url);
 
-    void addEntry(char *url);
+    void addPath(char *url, MessagePath chunk);
 
-    void addChunk(char *url, messageChunk chunk);
+    bool containsRecord(char *url);
 
-    bool contains(char *url);
+    std::list<MessagePath> getRecordByUrl(char *url);
 
-    std::list<messageChunk> getChunks(char *url);
+    bool isRecordFull(char *url);
 
-    bool entryIsFull(char *url);
+    void makeRecordFull(char *url);
 
-    void makeEntryFull(char *url);
+    void listenToUrl(char *url, CacheRepository *listener);
 
-    void listenToUrl(char *url, CacheReader *listener);
-
-    void stopListening(CacheReader *listener);
-
-    void clear();
+    void stopListening(CacheRepository *listener);
 
     Cache();
 

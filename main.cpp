@@ -1,17 +1,17 @@
-#include "HttpProxy.h"
-#include <csignal>
-
-HttpProxy *proxy;
-
-void sigHandler(int signal) {
-	proxy->clear();
-	delete proxy;
-	exit(0);
-}
+#include "ProxyServer.h"
 
 int main(int argc, char** argv) {
-    proxy = new HttpProxy(std::stoi(argv[1]));
-    std::signal(SIGINT, sigHandler);
-    proxy->start();
+    if (argc < 2) {
+        std::cerr << "You must enter port" << std::endl;
+        return 0;
+    }
+
+    try {
+        auto *proxyServer = new ProxyServer(std::stoi(argv[1]));
+        proxyServer->run();
+    } catch (std::invalid_argument &exception) {
+        std::cerr << "Port must be an integer value" << std::endl;
+    }
+
     return 0;
 }

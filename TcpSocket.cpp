@@ -1,7 +1,6 @@
 #include "TcpSocket.h"
 #include <iostream>
 
-
 TcpSocket::TcpSocket() {
     fd = socket(AF_INET, SOCK_STREAM, 0);
 }
@@ -10,43 +9,46 @@ TcpSocket::TcpSocket(int fd) {
     this->fd = fd;
 }
 
-
-TcpSocket::~TcpSocket() {
-}
+TcpSocket::~TcpSocket() = default;
 
 char* TcpSocket::getHostName() {
     return hostName;
 }
 
-void TcpSocket::resolveHostName(char * hostName, int port,  addrinfo **res) {
-    addrinfo hints;
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_flags = AI_CANONNAME;
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
+void TcpSocket::resolveHostName(char* hostName, int port, addrinfo **res) {
+    addrinfo addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.ai_socktype = SOCK_STREAM;
+    addr.ai_family = AF_INET;
+    addr.ai_flags = AI_CANONNAME;
 
-    if (getaddrinfo(hostName, std::to_string(port).c_str(), &hints, res) != 0) {
-        std::cout << "Resolve for " << hostName << " failed" << std::endl;
-    }
+
+    if (getaddrinfo(hostName, std::to_string(port).c_str(), &addr, res) != 0)
+        std::cout << "Can't resolve " << hostName << std::endl;
 }
 
-void TcpSocket::_connect(char *hostName, int port) {
-    this->hostName = hostName;
-    struct addrinfo *hostAddrinfo;
-    resolveHostName(hostName,port, &hostAddrinfo);
-    if (connect(fd, hostAddrinfo->ai_addr, hostAddrinfo->ai_addrlen) != 0) {
-        std::cout << "Failed to connect to " << hostName << ":" << port << std::endl;
-    }
+void TcpSocket::socketConnect(char* _hostName, int port) {
+    hostName = _hostName;
+    addrinfo *hostAddrInfo;
+
+    resolveHostName(hostName, port, &hostAddrInfo);
+
+    if (connect(fd, hostAddrInfo->ai_addr, hostAddrInfo->ai_addrlen) != 0)
+        std::cout << "Can't connect to  " << hostName << ":" << port << std::endl;
 }
 
-int TcpSocket::_read(char * buf, int length) {
+void TcpSocket::closeSocket() const {
+    close(fd);
+}
+
+int TcpSocket::getFd() const {
+    return fd;
+}
+
+int TcpSocket::socketRead(char *buf, int length) const {
     return read(fd, buf, length);
 }
 
-int TcpSocket::_write(char * buf, int length) {
+int TcpSocket::socketWrite(char *buf, int length) const {
     return write(fd, buf, length);
-}
-
-void TcpSocket::_close() {
-    close(fd);
 }

@@ -1,50 +1,43 @@
 #include "ClientSocketHandler.h"
 
-ClientSocketHandler::ClientSocketHandler(TcpSocket* clientSocket, HttpProxy* proxy):
-	clientSocket(clientSocket), proxy(proxy) {
+ClientSocketHandler::ClientSocketHandler(TcpSocket *clientSocket, ProxyServer *proxy) :
+        clientSocket(clientSocket), proxyServer(proxy) {}
 
-}
+ClientSocketHandler::~ClientSocketHandler() = default;
 
-ClientSocketHandler::~ClientSocketHandler() {
-}
+bool ClientSocketHandler::parseRequest(char *req) {
+    if (strstr(req, "CONNECT") == req)
+        return false;
 
-bool ClientSocketHandler::parseRequest(char *request) {
-    //check if it's a GET request
-    if (strstr(request, "GET") == request) {
-        //find url
-        char *urlStart = strstr(request, "http://") + 7;
+    if (strstr(req, "GET") == req) {
+        const char *tmpUrl = strstr(req, "http://") + 7;
 
-        char *url = new char[2048];
-        int i;
-        for (i = 0; urlStart[i] != ' '; i++) {
-            url[i] = urlStart[i];
+        char url[URL_MAX_LEN];
+        int i = 0;
+        for (i = 0; tmpUrl[i] != ' '; i++) {
+            url[i] = tmpUrl[i];
         }
         url[i] = '\0';
 
-        //notify proxy about new request
-        proxy->gotNewRequest(this, url);
+        proxyServer->newRequest(this, url);
         return true;
-    } else if (strstr(request, "CONNECT") == request) {
-        return false;
     }
 
     return true;
 }
 
+
 bool ClientSocketHandler::recvChunk() {
-    char *buf = new char[MAX_CHUNK_SIZE];
-    int length = clientSocket->_read(buf, MAX_CHUNK_SIZE);
+    char *buf = new char[BUFFER_SIZE];
+    int len = clientSocket->socketRead(buf, BUFFER_SIZE);
 
     std::cout << "RECV:" << buf << std::endl;
 
-    if (length == 0)
+    if (len == 0)
         return false;
 
-    //add chunk to message queue
-    messageChunk chunk;
-    chunk.buf = buf;
-    chunk.length = length;
-    messageQueue.push_back(chunk);
+    MessagePath msgPath{buf, len};
+    messageQueue.push_back(msgPath);
 
     return parseRequest(buf);
 }
@@ -52,46 +45,37 @@ bool ClientSocketHandler::recvChunk() {
 bool ClientSocketHandler::sendChunk() {
     if (!messageQueue.empty()) {
         std::cout << "ClientSocketHandler messageQueue is not empty" << std::endl;
-        messageChunk chunk = messageQueue.front();
+        MessagePath chunk = messageQueue.front();
         messageQueue.pop_front();
 
-        int length = hostSocket->_write(chunk.buf, chunk.length);
-        std::cout << "send " << length << " bytes" << std::endl;
-        if (length == 0)
+        int len = destServerSocket->socketWrite(chunk.data, chunk.length);
+        std::cout << "send " << len << " bytes" << std::endl;
+        if (len == 0)
             return false;
     }
 
     return true;
 }
 
-bool ClientSocketHandler::handle(PollResult pollResult) {
-    int fd = pollResult.fd;
-    int revents = pollResult.revents;
-
-    if (revents & POLLHUP) {
-        //peer closed its end of the channel
+bool ClientSocketHandler::handlePollResult(PollResult pollResult) {
+    if (pollResult.revents & POLLHUP)
         return false;
-    }
 
-    if (fd == clientSocket->fd) {
-        if (revents & POLLIN) {
-            //we can read a chunk from client
+    if (pollResult.fd == clientSocket->getFd()) {
+        if (pollResult.revents & POLLIN)
             return recvChunk();
-        }
-    } else if (hostSocket != nullptr && fd == hostSocket->fd) {
-        if (revents & POLLOUT) {
-            //we can send a chunk to host
+    } else if (destServerSocket != nullptr && pollResult.fd == destServerSocket->getFd()) {
+        if (pollResult.revents & POLLOUT)
             return sendChunk();
-        }
     }
 
     return true;
 }
 
-void ClientSocketHandler::setHostSocket(TcpSocket* hostSocket) {
-    this->hostSocket = hostSocket;
+void ClientSocketHandler::setDestServerSocket(TcpSocket *destServer) {
+    this->destServerSocket = destServer;
 }
 
 int ClientSocketHandler::getClientFd() {
-    return clientSocket->fd;
+    return clientSocket->getFd();
 }
